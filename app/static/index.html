@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>星载计算载荷 · 乱序执行轨迹复核器</title>
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="logo">🛰️</span>
+    <div>
+      <h1>乱序执行轨迹复核器</h1>
+      <p>微码补丁上传前审查 · 确认错误预测分支 / 精确异常不会把错误路径结果写入已提交状态</p>
+    </div>
+  </div>
+  <div id="health" class="health" title="健康检查 /healthz">检测中…</div>
+</header>
+
+<main class="layout">
+  <section class="panel input-panel">
+    <div class="panel-head">
+      <h2>轨迹输入</h2>
+      <div class="hint">至多 <b>24</b> 条指令、<b>96</b> 个事件；事件类型：
+        <code>dispatch</code> <code>writeback</code> <code>resolve</code> <code>commit</code> <code>exception</code></div>
+    </div>
+
+    <div class="editor-bar">
+      <button data-sample="correct" class="btn ghost">载入示例：误预测回滚（合规）</button>
+      <button data-sample="violation" class="btn ghost">载入示例：乱序提交（违规）</button>
+      <button data-sample="exception" class="btn ghost">载入示例：精确异常边界</button>
+    </div>
+
+    <label class="field-label">instructions（指令定义）</label>
+    <textarea id="instrInput" spellcheck="false"></textarea>
+    <label class="field-label">events（按发生顺序排列）</label>
+    <textarea id="eventInput" spellcheck="false"></textarea>
+
+    <div class="row">
+      <label class="mini">ROB 深度
+        <input id="robDepth" type="number" min="1" value="16">
+      </label>
+      <label class="mini">物理寄存器数（可选）
+        <input id="physRegs" type="number" min="8" placeholder="自动">
+      </label>
+      <button id="analyzeBtn" class="btn primary">提交复核</button>
+    </div>
+    <div id="inputError" class="input-error hidden"></div>
+  </section>
+
+  <section class="panel result-panel">
+    <div id="verdict" class="verdict hidden"></div>
+    <div id="violationCard" class="violation-card hidden"></div>
+    <div id="timeline" class="timeline">
+      <div class="empty">提交轨迹后，这里展示经分析 API 返回的逐步状态；点击任一事件可展开其前后映射、ROB 与回收寄存器证据。</div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span>初始 r0–r7 → p0–p7 固定映射 · 提交严格按 ROB 队首 · 分支检查点在映射改写前建立</span>
+</footer>
+
+<script src="/app.js"></script>
+</body>
+</html>
